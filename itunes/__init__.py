@@ -16,7 +16,7 @@ except ImportError:
 __name__ = 'pyitunes'
 __doc__ = 'A python interface to search iTunes Store'
 __author__ = 'Oscar Celma'
-__version__ = '0.1'
+__version__ = '0.2'
 __license__ = 'GPL'
 __maintainer__ = 'Oscar Celma'
 __email__ = 'ocelma@bmat.com'
@@ -28,6 +28,12 @@ HOST_NAME = 'http://itunes.apple.com/'
 
 __cache_enabled = False  # Enable cache? if set to True, make sure that __cache_dir exists! (e.g. $ mkdir ./cache)
 __cache_dir = './cache'  # Set cache directory
+
+
+
+def clean_json(data):
+   return data.replace('\\\\', r'//').replace(r"\'", '\"').replace(r'\"', '').replace(r'\u','')
+ 
 
 class ServiceException(Exception):
     """Exception related to the web service."""
@@ -83,6 +89,7 @@ class _Request(object):
                 response = self._get_cached_response()
             else:
                 response = self._download_response()
+            response = clean_json(response)
             return json.loads(response)
         except urllib2.HTTPError, e:
             raise self._get_error(e.fp.read())
@@ -179,7 +186,17 @@ class _BaseObject(object):
 class Search(_BaseObject):
     """ Search iTunes Store """
 
-    def __init__(self, query, country=COUNTRY, media='all', entity=None, attribute=None, offset=0, limit=50, lang='en_us', version=API_VERSION, explicit='Yes'):
+    def __init__(self, query, country=COUNTRY, media='all', entity=None,
+                 attribute=None, offset=0, limit=50, order=None,
+                 lang='en_us', version=API_VERSION, explicit='Yes'):
+        """
+        @param order: The results are returned in this order. Possible values
+            are 'rank' or 'popular.'
+        @param offset: Return search results starting at this offset. Useful
+            because there is a cap of 500 results per query.
+        @param limit: Return no more than this many results. Regardless of what
+            you specify, iTunes will never return more than 500 results.
+        """
         _BaseObject.__init__(self, 'search')
 
         self._search_terms = dict()
@@ -191,8 +208,10 @@ class Search(_BaseObject):
         if attribute:
             self._search_terms['attribute'] = attribute # The attribute you want to search for in the stores, relative to the specified media type
         self._search_terms['limit'] = limit       # Results limit
-	if offset > 0:
+        if offset > 0:
             self._search_terms['offset'] = offset
+        if order is not None:
+            self._search_terms['order'] = order
         self._search_terms['lang'] = lang         # The language, English or Japanese, you want to use when returning search results
         self._search_terms['version'] = version   # The search result key version you want to receive back from your search
         self._search_terms['explicit'] = explicit # A flag indicating whether or not you want to include explicit content in your search results
@@ -577,17 +596,25 @@ def get_md5(text):
     return hash.hexdigest()
 
 #SEARCHES
-def search_track(query, limit=100, offset=0, store=COUNTRY):
-    return Search(query=query, media='music', entity='song', offset=offset, limit=limit, country=store).get()
+def search_track(query, limit=100, offset=0, order=None, store=COUNTRY):
+    return Search(query=query, media='music', entity='song',
+                  offset=offset, limit=limit, order=order, country=store).get()
 
-def search_album(query, limit=100, offset=0, store=COUNTRY):
-    return Search(query=query, media='music', entity='album', limit=limit, offset=offset, country=store).get()
+def search_album(query, limit=100, offset=0, order=None, store=COUNTRY):
+    return Search(query=query, media='music', entity='album',
+                  limit=limit, offset=offset, order=order, country=store).get()
 
-def search_artist(query, limit=100, offset=0, store=COUNTRY):
-    return Search(query=query, media='music', entity='musicArtist', limit=limit, offset=offset, country=store).get()
+def search_artist(query, limit=100, offset=0, order=None, store=COUNTRY):
+    return Search(query=query, media='music', entity='musicArtist',
+                  limit=limit, offset=offset, order=order, country=store).get()
 
-def search(query, media='all', limit=100, offset=0, store=COUNTRY):
-    return Search(query=query, media=media, limit=limit, offset=offset, country=store).get()
+def search_app(query, limit=100, offset=0, order=None, store=COUNTRY):
+    return Search(query=query, media='software', limit=limit,
+                  offset=offset, order=order, country=store).get()
+
+def search(query, media='all', limit=100, offset=0, order=None, store=COUNTRY):
+    return Search(query=query, media=media, limit=limit,
+                  offset=offset, order=order, country=store).get()
 
 #LOOKUP
 def lookup(id):
