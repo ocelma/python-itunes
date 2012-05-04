@@ -40,12 +40,12 @@ Search
   artist = itunes.search_artist('u2')[0]
   for album in artist.get_albums():
       for track in album.get_tracks():
-          print album.get_name(), album.get_url(), track.get_name(), track.get_duration(), track.get_preview()
+          print album.get_name(), album.get_url(), track.get_name(), track.get_duration(), track.get_preview_url()
 
   # Search U2 videos
   videos = itunes.search(query='u2', media='musicVideo')
   for video in videos:
-      print video.get_name(), video.get_preview(), video.get_artwork()
+      print video.get_name(), video.get_preview_url(), video.get_artwork()
 
   # Search Volta album by Björk
   album = itunes.search_album('Volta Björk')[0]
