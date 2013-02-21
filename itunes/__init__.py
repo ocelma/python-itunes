@@ -352,7 +352,7 @@ class Item(object):
             return self
         if self.type == 'song':
             return self.get_album()
-        items = Lookup(id=self.id, entity='album', limit=limit).get()[1:]
+        items = Lookup(id=self.id, entity='album', limit=limit).get()
         if not items:
             raise ServiceException(type='Error', message='Nothing found!')
         return items[1:]
