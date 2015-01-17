@@ -4,9 +4,9 @@ import os
 import urllib2, urllib
 import urlparse
 import re
-try: 
+try:
     import simplejson as json
-except ImportError: 
+except ImportError:
     import json
 try:
     from hashlib import md5
@@ -33,18 +33,18 @@ __cache_dir = './cache'  # Set cache directory
 
 def clean_json(data):
    return data.replace('\\\\', r'//').replace(r"\'", '\"').replace(r'\"', '').replace(r'\u','')
- 
+
 
 class ServiceException(Exception):
     """Exception related to the web service."""
-    
+
     def __init__(self, type, message):
         self._type = type
         self._message = message
-    
+
     def __str__(self):
         return self._type + ': ' + self._message
-    
+
     def get_message(self):
         return self._message
 
@@ -81,7 +81,7 @@ class _Request(object):
 
         request = urllib2.Request(url)
         response = urllib2.urlopen(request)
-        return response.read() 
+        return response.read()
 
     def execute(self, cacheable=False):
         try:
@@ -95,7 +95,7 @@ class _Request(object):
             raise self._get_error(e.fp.read())
 
     def _get_cache_key(self):
-        """Cache key""" 
+        """Cache key"""
         keys = self.params.keys()[:]
         keys.sort()
         string = self.method
@@ -126,18 +126,18 @@ class _Request(object):
 # Webservice BASE OBJECT
 class _BaseObject(object):
     """An abstract webservices object."""
-        
+
     def __init__(self, method):
         self._method = method
         self._search_terms = dict()
-    
+
     def _request(self, method_name=None, params = None, cacheable = False):
         if not method_name:
             method_name = self._method
         if not params:
-            params = self._get_params()    
+            params = self._get_params()
         return _Request(method_name, params).execute(cacheable)
-    
+
     def _get_params(self):
         params = {}
         for key in self._search_terms.keys():
@@ -222,20 +222,24 @@ class Search(_BaseObject):
     def num_results(self):
         return self._num_results
 
+
 # LOOKUP
 class Lookup(_BaseObject):
-    """ Lookup """
+    """ Loookup """
 
-    def __init__(self, id, entity=None, limit=50):
+    def __init__(self, id, entity=None, country=None, limit=50):
         _BaseObject.__init__(self, 'lookup')
+
         self.id = id
         self._search_terms['id'] = id
         if entity:
-            self._search_terms['entity'] = entity# The type of results you want returned, relative to the specified media type
-        self._search_terms['limit'] = limit      # Results limit
+            self._search_terms['entity'] = entity  # The type of results you want returned, relative to the specified media type
+        if country:
+            self._search_terms['country'] = country  # Retrieve localized version of item data
+        self._search_terms['limit'] = limit  # Results limit
 
 
-# RESULT ITEM 
+# RESULT ITEM
 class Item(object):
     """ Item result class """
 
@@ -272,13 +276,13 @@ class Item(object):
 
     def _set_artwork(self, json):
         self.artwork = dict()
-        if json.has_key('artworkUrl30'): 
+        if json.has_key('artworkUrl30'):
             self.artwork['30'] = json['artworkUrl30']
-        if json.has_key('artworkUrl60'): 
+        if json.has_key('artworkUrl60'):
             self.artwork['60'] = json['artworkUrl60']
-        if json.has_key('artworkUrl100'): 
+        if json.has_key('artworkUrl100'):
             self.artwork['100'] = json['artworkUrl100']
-        if json.has_key('artworkUrl512'): 
+        if json.has_key('artworkUrl512'):
             self.artwork['512'] = json['artworkUrl512']
 
     def _set_url(self, json):
@@ -616,9 +620,10 @@ def search(query, media='all', limit=100, offset=0, order=None, store=COUNTRY):
     return Search(query=query, media=media, limit=limit,
                   offset=offset, order=order, country=store).get()
 
-#LOOKUP
-def lookup(id):
-    items = Lookup(id).get()
+
+# LOOKUP
+def lookup(id, entity=None, country=None):
+    items = Lookup(id, entity=entity, country=country).get()
     if not items:
         raise ServiceException(type='Error', message='Nothing found!')
     return items[0]
