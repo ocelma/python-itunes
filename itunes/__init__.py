@@ -284,6 +284,8 @@ class Item(object):
             self.artwork['100'] = json['artworkUrl100']
         if json.has_key('artworkUrl512'):
             self.artwork['512'] = json['artworkUrl512']
+        if json.has_key('artworkUrl1100'):
+            self.artwork['1100'] = json['artworkUrl1100']
 
     def _set_url(self, json):
         self.url = None
