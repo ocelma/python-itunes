@@ -7,12 +7,13 @@ U2_ONE = 'One'
 U2_ACHTUNGBABY = 'Achtung Baby (Deluxe Edition) [Remastered]' # 'Achtung Baby'
 
 U2_ONE_ID = 475391315 # Before it was 368617
-U2_ACHTUNGBABY_ID = 475390461 # Before it was 368713
+U2_ACHTUNGBABY_ID = 475387108 # Before it was 368713
 U2_ID = 78500
 
 U2_URL = 'http://itunes.apple.com/us/artist/u2/id%s?uo=4' % U2_ID
 U2_ACHTUNGBABY_URL = 'http://itunes.apple.com/us/album/achtung-baby-deluxe-edition/id%s?uo=4' % U2_ACHTUNGBABY_ID
 U2_ONE_URL = 'http://itunes.apple.com/us/album/one/id%s?i=%s&uo=4' % (U2_ACHTUNGBABY_ID, U2_ONE_ID)
+U2_ONE_URL_HTTPS_ = 'https://itunes.apple.com/us/album/one/id%s?i=%s&uo=4' % (U2_ACHTUNGBABY_ID, U2_ONE_ID)
 
 #SEARCHES
 def test_search_track():
@@ -27,7 +28,8 @@ def test_search_artist():
 def test_search_artist_store():
     U2_URL_ES = 'http://itunes.apple.com/es/artist/u2/id78500?l=en&uo=4'
     assert_equal(itunes.search_artist('u2', store='ES')[0].get_id(), U2_ID)
-    assert_equal(itunes.search_artist('u2', store='ES')[0].get_url(), U2_URL_ES)
+    url =itunes.search_artist('u2', store='ES')[0].get_url().replace('https','http')
+    assert_equal(url, U2_URL_ES)
 
 #LOOKUPS
 def test_lookup_track():
@@ -60,15 +62,18 @@ def test_lookup_notfound():
 #METHODS
 def test_artist_url():
     item = itunes.lookup(U2_ID)
-    assert_equal(item.get_url(), U2_URL)
+    url = item.get_url().replace('https','http')
+    assert_equal(url, U2_URL)
 
 def test_album_url():
     item = itunes.lookup(U2_ACHTUNGBABY_ID)
-    assert_equal(item.get_url(), U2_ACHTUNGBABY_URL)
+    url = item.get_url().replace('https','http')
+    assert_equal(url, U2_ACHTUNGBABY_URL)
 
 def test_track_url():
     item = itunes.lookup(U2_ONE_ID)
-    assert_equal(item.get_url(), U2_ONE_URL)
+    url = item.get_url().replace('https','http')
+    assert_equal(url, U2_ONE_URL)
 
 def test_album_length():
     item = itunes.lookup(U2_ACHTUNGBABY_ID)
