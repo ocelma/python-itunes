@@ -33,6 +33,8 @@ __cache_dir = './cache'  # Set cache directory
 
 
 def clean_json(data):
+   if isinstance(data,bytes):
+       data =data.decode()
    return data.replace('\\\\', r'//').replace(r"\'", '\"').replace(r'\"', '').replace(r'\u','')
 
 
@@ -90,7 +92,7 @@ class _Request(object):
                 response = self._get_cached_response()
             else:
                 response = self._download_response()
-            #response = clean_json(response)
+            response = clean_json(response)
             return json.loads(response)
         except urllib.error.HTTPError as e:
             raise self._get_error(e.fp.read())
@@ -304,7 +306,7 @@ class Item(object):
                 self._set_name(self.json['collectionName'])
             elif 'artistName' in self.json:
                 self._set_name(self.json['artistName'])
-        return self.name.encode('utf8')
+        return self.name
 
     def __eq__(self, other):
         return self.id == other.id
