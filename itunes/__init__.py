@@ -1,8 +1,9 @@
 #!/usr/bin/python
 """A python interface to search iTunes Store"""
 import os
-import urllib2, urllib
-import urlparse
+import urllib
+import numbers
+from six.moves import urllib
 import re
 try:
     import simplejson as json
@@ -63,24 +64,24 @@ class _Request(object):
         data = []
         for name in self.params.keys():
             value = self.params[name]
-            if isinstance(value, int) or isinstance(value, float) or isinstance(value, long):
+            if isinstance(value, numbers.Integral) or isinstance(value, float) :
                 value = str(value)
             try:
-                data.append('='.join((name, urllib.quote_plus(value.replace('&amp;', '&').encode('utf8')))))
+                data.append('='.join((name, urllib.parse.quote_plus(value.replace('&amp;', '&').encode('utf8')))))
             except UnicodeDecodeError:
-                data.append('='.join((name, urllib.quote_plus(value.replace('&amp;', '&')))))
+                data.append('='.join((name, urllib.parse.quote_plus(value.replace('&amp;', '&')))))
         data = '&'.join(data)
 
         url = HOST_NAME
-        parsed_url = urlparse.urlparse(url)
+        parsed_url = urllib.parse.urlparse(url)
         if not parsed_url.scheme:
             url = "http://" + url
         url += self.method + '?'
         url += data
         #print url
 
-        request = urllib2.Request(url)
-        response = urllib2.urlopen(request)
+        request = urllib.request.Request(url)
+        response = urllib.request.urlopen(request)
         return response.read()
 
     def execute(self, cacheable=False):
@@ -91,7 +92,7 @@ class _Request(object):
                 response = self._download_response()
             response = clean_json(response)
             return json.loads(response)
-        except urllib2.HTTPError, e:
+        except urllib.error.HTTPError as e:
             raise self._get_error(e.fp.read())
 
     def _get_cache_key(self):
