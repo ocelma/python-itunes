@@ -6,26 +6,30 @@ U2 = 'U2'
 U2_ONE = 'One'
 U2_ACHTUNGBABY = 'Achtung Baby (Deluxe Edition) [Remastered]' # 'Achtung Baby'
 
+MUSIC_VIDEO_KIND = 'music-video'
+SONG_KIND = "song"
+COLLECTION_KIND = "collection"
+
 U2_ONE_ID = 475391315 # Before it was 368617
 U2_ACHTUNGBABY_ID = 475390461 # Before it was 368713
 U2_ID = 78500
 
-U2_URL = 'http://itunes.apple.com/us/artist/u2/id%s?uo=4' % U2_ID
-U2_ACHTUNGBABY_URL = 'http://itunes.apple.com/us/album/achtung-baby-deluxe-edition/id%s?uo=4' % U2_ACHTUNGBABY_ID
-U2_ONE_URL = 'http://itunes.apple.com/us/album/one/id%s?i=%s&uo=4' % (U2_ACHTUNGBABY_ID, U2_ONE_ID)
+U2_URL = 'https://itunes.apple.com/us/artist/u2/id%s?uo=4' % U2_ID
+U2_ACHTUNGBABY_URL = 'https://itunes.apple.com/us/album/achtung-baby-deluxe-edition/id%s?uo=4' % U2_ACHTUNGBABY_ID
+U2_ONE_URL = 'https://itunes.apple.com/us/album/one/id%s?i=%s&uo=4' % (U2_ACHTUNGBABY_ID, U2_ONE_ID)
 
 #SEARCHES
-def test_search_track():
-    assert_equal(itunes.search_track('u2 achtung baby one')[0].get_id(), U2_ONE_ID)
+def test_search_track_kind():
+    assert_equal(itunes.search_track('u2 achtung baby one')[0].get_type(), SONG_KIND)
 
 def test_search_album():
-    assert_equal(itunes.search_album('u2 achtung baby')[0].get_id(), U2_ACHTUNGBABY_ID)
+    assert_equal(itunes.search_album('u2 achtung baby')[0].get_type(), COLLECTION_KIND)
 
 def test_search_artist():
     assert_equal(itunes.search_artist('u2')[0].get_id(), U2_ID)
 
 def test_search_artist_store():
-    U2_URL_ES = 'http://itunes.apple.com/es/artist/u2/id78500?l=en&uo=4'
+    U2_URL_ES = 'https://itunes.apple.com/es/artist/u2/id78500?l=en&uo=4'
     assert_equal(itunes.search_artist('u2', store='ES')[0].get_id(), U2_ID)
     assert_equal(itunes.search_artist('u2', store='ES')[0].get_url(), U2_URL_ES)
 
@@ -73,6 +77,10 @@ def test_track_url():
 def test_album_length():
     item = itunes.lookup(U2_ACHTUNGBABY_ID)
     assert_true(len(item.get_tracks()) == 26) # 12)
+
+def test_music_video_kind():
+    item = itunes.lookup(U2_ID)
+    assert_equal(item.get_music_videos()[0].get_type(), MUSIC_VIDEO_KIND)
 
 #TEXT: Unicode
 def test_unicode():
