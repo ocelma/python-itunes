@@ -327,6 +327,10 @@ class Item(object):
         """ Returns the Item's name """
         return self.__repr__()
 
+    def get_type(self):
+        """ Returns the type of the Item """
+        return self.type
+
     def get_url(self):
         """ Returns the iTunes Store URL of the Item """
         return self.url
@@ -343,11 +347,24 @@ class Item(object):
         """ Returns the artwork (a dict) of the item """
         return self.artwork
 
+    def get_songs(self, limit=500):
+        """ Just an alias for get_tracks """
+        return self.get_tracks(limit)
+
     def get_tracks(self, limit=500):
         """ Returns the tracks of the Item """
         if self.type == 'song':
             return self
         items = Lookup(id=self.id, entity='song', limit=limit).get()
+        if not items:
+            raise ServiceException(type='Error', message='Nothing found!')
+        return items[1:]
+
+    def get_music_videos(self, limit=500):
+        """ Returns the tracks of the Item """
+        if self.type == 'musicVideo':
+            return self
+        items = Lookup(id=self.id, entity='musicVideo', limit=limit).get()
         if not items:
             raise ServiceException(type='Error', message='Nothing found!')
         return items[1:]
@@ -602,8 +619,16 @@ def get_md5(text):
     return hash.hexdigest()
 
 #SEARCHES
+def search_song(query, limit=100, offset=0, order=None, store=COUNTRY):
+    """ Just an alias for search_track """
+    return search_track(query, limit, offset, order, store)
+
 def search_track(query, limit=100, offset=0, order=None, store=COUNTRY):
     return Search(query=query, media='music', entity='song',
+                  offset=offset, limit=limit, order=order, country=store).get()
+
+def search_music_video(query, limit=100, offset=0, order=None, store=COUNTRY):
+    return Search(query=query, media='music', entity='musicVideo',
                   offset=offset, limit=limit, order=order, country=store).get()
 
 def search_album(query, limit=100, offset=0, order=None, store=COUNTRY):
