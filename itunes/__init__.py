@@ -24,7 +24,11 @@ __status__ = 'Beta'
 
 API_VERSION = '2'        # iTunes API version
 COUNTRY = 'US'           # ISO Country Store
-HOST_NAME = 'http://itunes.apple.com/'
+
+# we have to witch to use https instead of http since some apple serve returned html instead of json
+# curl 'http://itunes.apple.com/lookup?limit=500&id=529352559&entity=song' ---> returned HTML of iTunes Music Store RSS Generator Page
+# curl 'https://itunes.apple.com/lookup?limit=500&id=529352559&entity=song' ---> just fine
+HOST_NAME = 'https://itunes.apple.com/'
 
 __cache_enabled = False  # Enable cache? if set to True, make sure that __cache_dir exists! (e.g. $ mkdir ./cache)
 __cache_dir = './cache'  # Set cache directory
@@ -73,13 +77,16 @@ class _Request(object):
 
         url = HOST_NAME
         parsed_url = urlparse.urlparse(url)
+        # we have to witch to use https instead of http since some apple serve returned html instead of json
+        # curl 'http://itunes.apple.com/lookup?limit=500&id=529352559&entity=song' ---> returned HTML of iTunes Music Store RSS Generator Page
+        # curl 'https://itunes.apple.com/lookup?limit=500&id=529352559&entity=song' ---> just fine
         if not parsed_url.scheme:
-            url = "http://" + url
+            url = "https://" + url
         url += self.method + '?'
         url += data
-        #print url
 
         request = urllib2.Request(url)
+        request.add_header('foo', 'bar')
         response = urllib2.urlopen(request)
         return response.read()
 
