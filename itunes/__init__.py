@@ -369,7 +369,7 @@ class Item(object):
             raise ServiceException(type='Error', message='Nothing found!')
         return items[1:]
 
-    def get_albums(self, limit=200):
+    def get_albums(self, limit=500):
         """ Returns the albums of the Item """
         if self.type == 'collection':
             return self
