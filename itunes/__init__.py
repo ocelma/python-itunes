@@ -24,6 +24,7 @@ __status__ = 'Beta'
 
 API_VERSION = '2'        # iTunes API version
 COUNTRY = 'US'           # ISO Country Store
+
 HOST_NAME = 'http://itunes.apple.com/'
 
 __cache_enabled = False  # Enable cache? if set to True, make sure that __cache_dir exists! (e.g. $ mkdir ./cache)
@@ -77,7 +78,6 @@ class _Request(object):
             url = "http://" + url
         url += self.method + '?'
         url += data
-        #print url
 
         request = urllib2.Request(url)
         response = urllib2.urlopen(request)
@@ -227,7 +227,7 @@ class Search(_BaseObject):
 class Lookup(_BaseObject):
     """ Loookup """
 
-    def __init__(self, id, entity=None, country=None, limit=50):
+    def __init__(self, id, entity=None, country=None, limit=500):
         _BaseObject.__init__(self, 'lookup')
 
         self.id = id
@@ -369,7 +369,7 @@ class Item(object):
             raise ServiceException(type='Error', message='Nothing found!')
         return items[1:]
 
-    def get_albums(self, limit=200):
+    def get_albums(self, limit=500):
         """ Returns the albums of the Item """
         if self.type == 'collection':
             return self
@@ -649,8 +649,8 @@ def search(query, media='all', limit=100, offset=0, order=None, store=COUNTRY):
 
 
 # LOOKUP
-def lookup(id, entity=None, country=None):
-    items = Lookup(id, entity=entity, country=country).get()
+def lookup(id, entity=None, country=None, limit=500):
+    items = Lookup(id, entity=entity, country=country, limit=limit).get()
     if not items:
         raise ServiceException(type='Error', message='Nothing found!')
     return items[0]
