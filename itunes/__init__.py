@@ -528,6 +528,7 @@ class Software(Track):
         self._set_languages(json)
         self._set_avg_rating(json)
         self._set_num_ratings(json)
+        self._set_bundle_id(json)
 
     def _set_version(self, json):
         self.version = json.get('version', None)
@@ -562,6 +563,9 @@ class Software(Track):
         else:
             self.num_ratings = json.get('userRatingCount', None)
 
+    def _set_bundle_id(self, json):
+        self.bundle_id = json.get('bundleId', None)
+
     # GETTERs
     def get_version(self):
         return self.version
@@ -579,6 +583,8 @@ class Software(Track):
         return self.avg_rating
     def get_num_ratings(self):
         return self.num_ratings
+    def get_bundle_id(self):
+        return self.bundle_id
 
 # CACHE
 def enable_caching(cache_dir = None):
