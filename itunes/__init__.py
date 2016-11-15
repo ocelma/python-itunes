@@ -306,9 +306,13 @@ class Item(object):
         return self.name.encode('utf8')
 
     def __eq__(self, other):
+        if other == None:
+            return False
         return self.id == other.id
 
     def __ne__(self, other):
+        if other == None:
+            return False
         return self.id != other.id
 
     def _set_name(self, name):
