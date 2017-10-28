@@ -4,6 +4,7 @@ import os
 import urllib2, urllib
 import urlparse
 import re
+import datetime
 try:
     import simplejson as json
 except ImportError:
@@ -532,6 +533,30 @@ class Software(Track):
         self._set_languages(json)
         self._set_avg_rating(json)
         self._set_num_ratings(json)
+
+        self._set_file_size_bytes(json)
+        self._set_current_version_release_date(json)
+        self._set_bundle_id(json)
+        self._set_release_notes(json)
+        self._set_primary_genre_id(json)
+
+
+    def _set_file_size_bytes(self, json):
+        self.file_size_bytes = json.get('fileSizeBytes', 0)
+
+    def _set_current_version_release_date(self, json):
+        self.current_version_release_date = None
+        if json.has_key('currentVersionReleaseDate') and json['currentVersionReleaseDate']:
+            self.current_version_release_date = datetime.datetime.strptime( json['currentVersionReleaseDate'], r'%Y-%m-%dT%H:%M:%SZ' )
+
+    def _set_bundle_id(self, json):
+        self.bundle_id = json.get('bundleId', None)
+
+    def _set_release_notes(self, json):
+        self.release_notes = json.get('releaseNotes', None)
+
+    def _set_primary_genre_id(self, json):
+        self.primary_genre_id = json.get('primaryGenreId', 0)
 
     def _set_version(self, json):
         self.version = json.get('version', None)
