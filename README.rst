@@ -8,13 +8,13 @@ Installation
 
 Pypi package available at http://pypi.python.org/pypi/python-itunes/1.0
 
-::
+..  code-block:: bash
 
   $ easy_install python-itunes
 
 Or download the code from https://github.com/ocelma/python-itunes/archives/master and then
 
-::
+..  code-block:: bash
 
   $ python setup.py install
 
@@ -22,7 +22,7 @@ Or download the code from https://github.com/ocelma/python-itunes/archives/maste
 
   If you're using python version <= 2.5 you'll need to install simplejson. E.g:
 
-::
+..  code-block:: bash
 
   $ easy_install simplejson
 
@@ -32,7 +32,7 @@ Examples
 
 Search
 ~~~~~~
-::
+..  code-block:: python
 
   import itunes
   
@@ -69,7 +69,7 @@ Search
 Lookup
 ~~~~~~
 
-::
+..  code-block:: python
 
   import itunes
 
@@ -93,7 +93,7 @@ Lookup
 Caching JSON results
 ~~~~~~~~~~~~~~~~~~~~
 
-::
+..  code-block:: python
 
   import itunes
 
@@ -106,6 +106,6 @@ Caching JSON results
 Tests
 -----
 
-::
+..  code-block:: bash
 
   $ nosetests tests
